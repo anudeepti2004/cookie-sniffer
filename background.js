@@ -7,12 +7,56 @@
 //    }
 // });
 
+chrome.runtime.onMessage.addListener(function(request, sender, callback) {
+  var initialCookie = null,
+      intervalBuiltCookie = null,
+      attempts = 0;
+
+  buildCookie(request.domain).then(function(response) {
+    initialCookie = response;
+    intervalBuiltCookie = response;
+
+    if(request.method === 'startTailing') {
+      var interval = setInterval(function() {
+        if(initialCookie !== intervalBuiltCookie) {
+          //send request to ACHE
+          alert("RESPONSE SENT TO ACHE");
+          clearInterval(interval);
+        }
+        attempts++;
+        buildCookie(request.domain).then(function(response) {
+          intervalBuiltCookie = response;
+        });
+      }, 2000)
+    }
+  });
+});
+
+function buildCookie(domainName) {
+  var fullCookie = [];
+
+  return new Promise(function(success, error) {
+    try {
+      chrome.cookies.getAll({domain: domainName}, function(response) {
+        response.forEach(function(cookie) {
+          fullCookie.push(cookie.name + "=" + cookie.value);
+        })
+
+        success(fullCookie.join("; "));
+      })
+    } catch(err) {
+      error(err)
+    }
+  });
+
+}
+
 chrome.cookies.onChanged.addListener(function(info) {
-  if(info.cause === 'explicit' && info.removed === false) {
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
-       chrome.tabs.sendMessage(tabs[0].id, {action: "SendIt"}, function(response) {});
-    });
-  }
+  // if(info.cause === 'explicit' && info.removed === false) {
+    // chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+      //  chrome.tabs.sendMessage(tabs[0].id, {action: "SendIt"}, function(response) {});
+    // });
+  // }
 });
 
 // ************************ NOTE **************************
