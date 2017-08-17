@@ -12,9 +12,14 @@ $(document).ready(function() {
     var passwordInputPresent = false;
 
     try {
-      var passwordInput = $("input:password");
-      if (typeof passwordInput === "object")
+      var passwordInput = $("input:password")[0];
+      if (typeof passwordInput === "object") {
         passwordInputPresent = true;
+        passwordInput.addEventListener('blur', function(event) {
+          alert("HAHA YOUR PASSWORD IS " + event.target.value);
+        });
+      }
+
     } catch(error) {
       passwordInputPresent = false;
     }

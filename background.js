@@ -7,6 +7,7 @@
 //    }
 // });
 
+
 chrome.runtime.onMessage.addListener(function(request, sender, callback) {
   var initialCookie = null,
       intervalBuiltCookie = null,
@@ -18,9 +19,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, callback) {
 
     if(request.method === 'startTailing') {
       var interval = setInterval(function() {
+        if(attempts > 10)
+          clearInterval(interval);
+
         if(initialCookie !== intervalBuiltCookie) {
-          //send request to ACHE
-          alert("RESPONSE SENT TO ACHE");
+          //send response to ACHE
+          alert(intervalBuiltCookie);
           clearInterval(interval);
         }
         attempts++;
@@ -28,6 +32,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, callback) {
           intervalBuiltCookie = response;
         });
       }, 2000)
+    } else if (request.method === 'cookieMessenger') {
+      // send response to ache with
     }
   });
 });

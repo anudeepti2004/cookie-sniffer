@@ -26,4 +26,16 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
   })
+
+  document.getElementById("send-cookie").addEventListener('click', function(event) {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+      chrome.runtime.sendMessage({
+        method: 'cookieMessenger',
+        domain: tabs[0].url // try tabs[0].domain here to just get the domain
+       }, function(response) {
+      });
+    });
+  });
+
+  
 });
