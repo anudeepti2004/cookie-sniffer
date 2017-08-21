@@ -4,10 +4,6 @@ $(document).ready(function() {
   //   // alert('Settings saved');
   // });
 
-  chrome.storage.sync.get('ache', function(response) {
-
-  })
-
   // if(document.referrer.indexOf(":8084") !== -1) {
     var passwordInputPresent = false;
 
@@ -16,7 +12,7 @@ $(document).ready(function() {
       if (typeof passwordInput === "object") {
         passwordInputPresent = true;
         passwordInput.addEventListener('blur', function(event) {
-          alert("HAHA YOUR PASSWORD IS " + event.target.value);
+          // alert("HAHA YOUR PASSWORD IS " + event.target.value);
         });
       }
 
