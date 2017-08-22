@@ -31,7 +31,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, callback) {
             $.ajax({
              url: "http://localhost:8081/cookies",
              method: "POST",
-             data: data,
+             contentType: "application/json",
+             data: JSON.stringify(data),
              success: function(response) {
                alert("SUCCESSFULLY SENT TO ACHE");
              },
@@ -44,7 +45,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, callback) {
            $.ajax({
             url: "http://localhost:8080/cookies",
             method: "POST",
-            data: data,
+            contentType: "application/json",
+            data: JSON.stringify(data),
             success: function(response) {
               alert("SUCCESSFULLY SENT TO ACHE");
             },
