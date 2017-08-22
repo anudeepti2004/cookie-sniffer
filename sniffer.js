@@ -20,7 +20,8 @@ $(document).ready(function() {
     if(passwordInputPresent) {
        chrome.runtime.sendMessage({
          method: 'startTailing',
-         domain: document.domain
+         domain: document.domain,
+         origin: window.location.origin
         }, function(response) {
        }
      );

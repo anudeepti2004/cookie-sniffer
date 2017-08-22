@@ -11,11 +11,13 @@
 chrome.runtime.onMessage.addListener(function(request, sender, callback) {
   var initialCookie = null,
       intervalBuiltCookie = null,
+      intervalBuiltSerializedCookie = null;
       attempts = 0;
 
   buildCookie(request.domain).then(function(response) {
     initialCookie = response.stringifiedCookie;
     intervalBuiltCookie = response.stringifiedCookie;
+    intervalBuiltSerializedCookie = response.serializableCookie;
 
     if(request.method === 'startTailing') {
       setTimeout(function() {
@@ -24,13 +26,39 @@ chrome.runtime.onMessage.addListener(function(request, sender, callback) {
             clearInterval(interval);
 
           if(initialCookie !== intervalBuiltCookie) {
-            //send response to ACHE which is intervalBuiltCookie.serializableCookie
-            alert(intervalBuiltCookie);
+            var data = {};
+            data[request.origin] = intervalBuiltSerializedCookie;
+            $.ajax({
+             url: "http://localhost:8081/cookies",
+             method: "POST",
+             data: data,
+             success: function(response) {
+               alert("SUCCESSFULLY SENT TO ACHE");
+             },
+             error: function(err) {
+               console.log(err);
+               callback(null);
+             }
+           })
+
+           $.ajax({
+            url: "http://localhost:8080/cookies",
+            method: "POST",
+            data: data,
+            success: function(response) {
+              alert("SUCCESSFULLY SENT TO ACHE");
+            },
+            error: function(err) {
+              console.log(err);
+            }
+          })
+            // alert(intervalBuiltCookie);
             clearInterval(interval);
           }
           attempts++;
           buildCookie(request.domain).then(function(response) {
             intervalBuiltCookie = response.stringifiedCookie;
+            intervalBuiltSerializedCookie = response.serializableCookie;
           });
         }, 2000);
       }, 10000);
