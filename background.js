@@ -20,41 +20,41 @@ chrome.runtime.onMessage.addListener(function(request, sender, callback) {
     intervalBuiltSerializedCookie = response.serializableCookie;
 
     if(request.method === 'startTailing') {
-      setTimeout(function() {
+      // setTimeout(function() {
         var interval = setInterval(function() {
           if(attempts > 10)
             clearInterval(interval);
 
           if(initialCookie !== intervalBuiltCookie) {
-            var data = {};
-            data[request.origin] = intervalBuiltSerializedCookie;
-            $.ajax({
-             url: "http://localhost:8081/cookies",
-             method: "POST",
-             contentType: "application/json",
-             data: JSON.stringify(data),
-             success: function(response) {
-               alert("SUCCESSFULLY SENT TO ACHE");
-             },
-             error: function(err) {
-               console.log(err);
-               callback(null);
-             }
-           })
-
-           $.ajax({
-            url: "http://localhost:8080/cookies",
-            method: "POST",
-            contentType: "application/json",
-            data: JSON.stringify(data),
-            success: function(response) {
-              alert("SUCCESSFULLY SENT TO ACHE");
-            },
-            error: function(err) {
-              console.log(err);
-            }
-          })
-            // alert(intervalBuiltCookie);
+          //   var data = {};
+          //   data[request.origin] = intervalBuiltSerializedCookie;
+          //   $.ajax({
+          //    url: "http://localhost:8081/cookies",
+          //    method: "POST",
+          //    contentType: "application/json",
+          //    data: JSON.stringify(data),
+          //    success: function(response) {
+          //      alert("SUCCESSFULLY SENT TO ACHE");
+          //    },
+          //    error: function(err) {
+          //      console.log(err);
+          //    }
+          //  })
+          //
+          //  $.ajax({
+          //   url: "http://localhost:8080/cookies",
+          //   method: "POST",
+          //   contentType: "application/json",
+          //   data: JSON.stringify(data),
+          //   success: function(response) {
+          //     alert("SUCCESSFULLY SENT TO ACHE");
+          //   },
+          //   error: function(err) {
+          //     console.log(err);
+          //   }
+          // })
+            alert(intervalBuiltCookie);
+            // console.log(intervalBuiltCookie);
             clearInterval(interval);
           }
           attempts++;
@@ -63,7 +63,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, callback) {
             intervalBuiltSerializedCookie = response.serializableCookie;
           });
         }, 2000);
-      }, 10000);
+      // }, 10000);
     } else if (request.method === 'cookieMessenger') {
       //send response to ACHE which is intervalBuiltCookie.serializableCookie
     }
