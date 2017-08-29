@@ -1,13 +1,3 @@
-
-// chrome.tabs.query.addListener(function (tabId, changeInfo, tab) {
-//    if (changeInfo.status == 'complete') {
-//       chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
-//          chrome.tabs.sendMessage(tabs[0].id, {action: "SendIt"}, function(response) {});
-//       });
-//    }
-// });
-
-
 chrome.runtime.onMessage.addListener(function(request, sender, callback) {
   var initialCookie = null,
       intervalBuiltCookie = null,
@@ -20,52 +10,36 @@ chrome.runtime.onMessage.addListener(function(request, sender, callback) {
     intervalBuiltSerializedCookie = response.serializableCookie;
 
     if(request.method === 'startTailing') {
-      // setTimeout(function() {
-        var interval = setInterval(function() {
-          if(attempts > 10)
-            clearInterval(interval);
+      var interval = setInterval(function() {
+        if(attempts > 10)
+          clearInterval(interval);
 
-          if(initialCookie !== intervalBuiltCookie) {
-          //   var data = {};
-          //   data[request.origin] = intervalBuiltSerializedCookie;
-          //   $.ajax({
-          //    url: "http://localhost:8081/cookies",
-          //    method: "POST",
-          //    contentType: "application/json",
-          //    data: JSON.stringify(data),
-          //    success: function(response) {
-          //      alert("SUCCESSFULLY SENT TO ACHE");
-          //    },
-          //    error: function(err) {
-          //      console.log(err);
-          //    }
-          //  })
-          //
-          //  $.ajax({
-          //   url: "http://localhost:8080/cookies",
-          //   method: "POST",
-          //   contentType: "application/json",
-          //   data: JSON.stringify(data),
-          //   success: function(response) {
-          //     alert("SUCCESSFULLY SENT TO ACHE");
-          //   },
-          //   error: function(err) {
-          //     console.log(err);
-          //   }
-          // })
-            alert(intervalBuiltCookie);
-            // console.log(intervalBuiltCookie);
-            clearInterval(interval);
-          }
-          attempts++;
-          buildCookie(request.domain).then(function(response) {
-            intervalBuiltCookie = response.stringifiedCookie;
-            intervalBuiltSerializedCookie = response.serializableCookie;
+        if(initialCookie !== intervalBuiltCookie) {
+          var data = {};
+          data[request.origin] = intervalBuiltSerializedCookie;
+
+          chrome.storage.sync.get('ache', function(response) {
+            if(response.ache) {
+              postToAche(response.ache, data);
+            }
           });
-        }, 2000);
-      // }, 10000);
+          clearInterval(interval);
+        }
+        attempts++;
+        buildCookie(request.domain).then(function(response) {
+          intervalBuiltCookie = response.stringifiedCookie;
+          intervalBuiltSerializedCookie = response.serializableCookie;
+        });
+      }, 3000);
     } else if (request.method === 'cookieMessenger') {
-      //send response to ACHE which is intervalBuiltCookie.serializableCookie
+      var data = {};
+      data[request.origin] = intervalBuiltSerializedCookie;
+
+      chrome.storage.sync.get('ache', function(response) {
+        if(response.ache) {
+          postToAche(response.ache, data);
+        }
+      });
     }
   });
 });
@@ -111,13 +85,20 @@ function mutateCookieResponse(cookie) {
   return mutatedObject;
 }
 
-chrome.cookies.onChanged.addListener(function(info) {
-  // if(info.cause === 'explicit' && info.removed === false) {
-    // chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
-      //  chrome.tabs.sendMessage(tabs[0].id, {action: "SendIt"}, function(response) {});
-    // });
-  // }
-});
+function postToAche(url, data) {
+  $.ajax({
+   url: url + "/cookies",
+   method: "POST",
+   contentType: "application/json",
+   data: JSON.stringify(data),
+   success: function(response) {
+     console.log(response);
+   },
+   error: function(err) {
+     console.log(err);
+   }
+ })
+}
 
 // ************************ NOTE **************************
 // COMMENTING BECAUSE ICON CLICK SHOULD OPEN A POPUP RATHER THAN A NEW BROWSER TAB
