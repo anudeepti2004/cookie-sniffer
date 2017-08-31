@@ -1,12 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // chrome.windows.getAll({populate:true},function(windows){
-  //   windows.forEach(function(window){
-  //     window.tabs.forEach(function(tab){
-  //       //GET URLS FROM ALL WINDOWS AND ALL TABS
-  //       console.log(tab.url);
-  //     });
-  //   });
-  // });
 
   // SET DDT SERVER ADDRESS
   chrome.tabs.query({},function(tabs){
@@ -18,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
+  // SET ACHE SERVER ADDRESS IF PRESENT IN SYCN STORAGE
   chrome.storage.sync.get('ache', function(response) {
     var acheInputElement = document.getElementById('ache-server');
     if(acheInputElement) {
@@ -25,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   })
 
+  // STORE ACHE SERVER CREDENTIALS INTO SYNC STORAGE
   document.getElementById("submit").addEventListener('click', function(event) {
     var acheInputElement = document.getElementById('ache-server');
     if(acheInputElement.value !== "") {
@@ -34,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   })
 
+  // SEND MESSAGE TO BACKGROUND SCRIPT TO SEND CURRENT COOKIE OBJECT TO ACHE
   document.getElementById("send-cookie").addEventListener('click', function(event) {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
       chrome.runtime.sendMessage({

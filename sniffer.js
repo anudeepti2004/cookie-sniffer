@@ -9,7 +9,7 @@ $(document).ready(function() {
         passwordInputPresent = true;
         url = document.documentURI;
         passwordInput.addEventListener('blur', function(event) {
-          // alert("HAHA YOUR PASSWORD IS " + event.target.value);
+
         });
       }
 
@@ -17,6 +17,7 @@ $(document).ready(function() {
       passwordInputPresent = false;
     }
 
+    // START POLLING FOR A COOKIE CHANGE WHEN A LOGIN FORM IS DETECTED
     if(passwordInputPresent) {
        chrome.runtime.sendMessage({
          method: 'startTailing',
