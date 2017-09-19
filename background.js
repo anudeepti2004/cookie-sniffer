@@ -57,7 +57,7 @@ function buildCookie(domainName) {
 
   return new Promise(function(success, error) {
     try {
-      chrome.cookies.getAll({domain: domainName}, function(response) {
+      chrome.cookies.getAll({url: domainName}, function(response) {
         response.forEach(function(cookie) {
           fullCookie.push(cookie.name + "=" + cookie.value);
           serializableCookie.push(mutateCookieResponse(cookie));
