@@ -1,45 +1,15 @@
 // LISTENER FOR INCOMING MESSAGES FROM CONTENT SCRIPTS
 chrome.runtime.onMessage.addListener(function(request, sender, callback) {
-  var initialCookie = null,
-      intervalBuiltCookie = null,
-      intervalBuiltSerializedCookie = null;
-      attempts = 0;
+  var intervalBuiltSerializedCookie = null;
+
 
   // RESOLVE buildCookie PROMISE
   buildCookie(request.domain).then(function(response) {
-    initialCookie = response.stringifiedCookie;
-    intervalBuiltCookie = response.stringifiedCookie;
     intervalBuiltSerializedCookie = response.serializableCookie;
 
-    // THIS IS POLLING FOR A COOKIE CHANGE
-    if(request.method === 'startTailing') {
-      var interval = setInterval(function() {
-        if(attempts > 10) // 10 RETRIES HOPING THAT THE USER WILL ENTER HIS CRENDENTIALS AND THE COOKIE WILL CHANGE
-          clearInterval(interval);
-
-        // THIS IS WHEN YOU KNOW THAT A NEW COOKIE HAS BEEN SET ON THE CLIENT SIDE
-        if(initialCookie !== intervalBuiltCookie) {
-          var data = {};
-          data[request.origin] = intervalBuiltSerializedCookie;
-
-          // GET ACHE SERVER CREDENTIALS AND ISSUE A POST REQUEST WITH THE UPDATED COOKIE
-          chrome.storage.sync.get('ache', function(response) {
-            if(response.ache) {
-              postToAche(response.ache, data);
-            }
-          });
-          clearInterval(interval);
-        }
-        attempts++;
-        buildCookie(request.domain).then(function(response) {
-          intervalBuiltCookie = response.stringifiedCookie;
-          intervalBuiltSerializedCookie = response.serializableCookie;
-        });
-      }, 3000);
-      // THIS IS TO SEND A COOKIE ON USER REQUEST
-    } else if (request.method === 'cookieMessenger') {
+    if (request.method === 'cookieMessenger') {
       var data = {};
-      data[request.origin] = intervalBuiltSerializedCookie;
+      data[request.domain] = intervalBuiltSerializedCookie;
 
       chrome.storage.sync.get('ache', function(response) {
         if(response.ache) {
